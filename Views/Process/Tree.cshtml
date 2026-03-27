@@ -1,0 +1,11 @@
+@model ItemProcessor.Models.ViewModels.ItemTreeViewModel
+@{ ViewData["Title"] = "Item Tree"; }
+
+<h2>Tree View — @ViewBag.RootName</h2>
+<a asp-action="AllTrees" class="btn btn-secondary btn-sm mb-3">← All Trees</a>
+
+<div class="card">
+    <div class="card-body">
+        @await Html.PartialAsync("_TreeNode", Model)
+    </div>
+</div>

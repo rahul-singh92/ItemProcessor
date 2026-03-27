@@ -1,0 +1,30 @@
+@model List<ItemProcessor.Models.Item>
+@{ ViewData["Title"] = "All Item Trees"; }
+
+<h2>Item Trees</h2>
+<p class="text-muted">Select a root item to view its full processing tree.</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No processed items yet.
+        <a asp-controller="Item" asp-action="Index">Go to Items</a>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-3 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.ItemName</h5>
+                        <p class="text-muted">@item.Weight.ToString("F3") kg</p>
+                        <a asp-action="Tree" asp-route-id="@item.ItemId"
+                           class="btn btn-info btn-sm">View Tree</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,150 @@
+@model ItemProcessor.Models.ViewModels.ProcessItemViewModel
+@{ ViewData["Title"] = "Process Item"; }
+
+<h2>Process Item</h2>
+
+<form asp-action="Create" method="post" id="processForm">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <!-- Parent item selector -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">Select Parent Item</div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label" for="ParentItemId">Parent Item</label>
+                <select asp-for="ParentItemId" id="ParentItemId" class="form-select" required
+                        onchange="updateParentInfo(this)">
+                    <option value="">-- Select an item to process --</option>
+                    @foreach (var item in Model.AvailableItems)
+                    {
+                        <option value="@item.ItemId"
+                                data-weight="@item.Weight"
+                                data-name="@item.ItemName">
+                            @item.ItemName (@item.Weight.ToString("F3") kg)
+                        </option>
+                    }
+                </select>
+            </div>
+            <div id="parentInfo" class="alert alert-info d-none">
+                Selected: <strong id="parentName"></strong> —
+                Weight: <strong id="parentWeight"></strong> kg
+            </div>
+        </div>
+    </div>
+
+    <!-- Child items -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between">
+            <span>Output Items</span>
+            <button type="button" class="btn btn-sm btn-light"
+                    onclick="addChild()">+ Add Output</button>
+        </div>
+        <div class="card-body" id="childContainer">
+            <div class="child-item border rounded p-3 mb-2" id="child_0">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label" for="ChildItems_0__ItemName">Output Item Name</label>
+                        <input name="ChildItems[0].ItemName" id="ChildItems_0__ItemName"
+                               class="form-control" required placeholder="e.g. Output B"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="ChildItems_0__Weight">Weight (kg)</label>
+                        <input name="ChildItems[0].Weight" id="ChildItems_0__Weight"
+                               class="form-control child-weight" type="number" step="0.001"
+                               min="0.001" required placeholder="0.000"
+                               oninput="updateTotal()"/>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="ChildItems_0__Notes">Notes</label>
+                        <input name="ChildItems[0].Notes" id="ChildItems_0__Notes"
+                               class="form-control" placeholder="Optional"/>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-outline-danger"
+                                onclick="removeChild('child_0')" title="Remove">✕</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            Total output weight:
+            <strong id="totalWeight">0.000</strong> kg
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success btn-lg">Process Item</button>
+    <a asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
+</form>
+
+@section Scripts {
+<script>
+let childCount = 1;
+
+function addChild() {
+    const i = childCount++;
+    const div = document.createElement('div');
+    div.className = 'child-item border rounded p-3 mb-2';
+    div.id = 'child_' + i;
+
+    div.innerHTML = `
+        <div class="row">
+            <div class="col-md-4">
+                <label class="form-label" for="ChildItems_${i}__ItemName">Output Item Name</label>
+                <input name="ChildItems[${i}].ItemName" id="ChildItems_${i}__ItemName"
+                       class="form-control" required
+                       placeholder="e.g. Output ${String.fromCharCode(66+i)}"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="ChildItems_${i}__Weight">Weight (kg)</label>
+                <input name="ChildItems[${i}].Weight" id="ChildItems_${i}__Weight"
+                       class="form-control child-weight"
+                       type="number" step="0.001" min="0.001"
+                       required placeholder="0.000"
+                       oninput="updateTotal()"/>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="ChildItems_${i}__Notes">Notes</label>
+                <input name="ChildItems[${i}].Notes" id="ChildItems_${i}__Notes"
+                       class="form-control" placeholder="Optional"/>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-danger"
+                        onclick="removeChild('child_${i}')"
+                        title="Remove">✕</button>
+            </div>
+        </div>`;
+    document.getElementById('childContainer').appendChild(div);
+}
+
+function removeChild(id) {
+    const el = document.getElementById(id);
+    if (document.querySelectorAll('.child-item').length > 1) {
+        el.remove();
+        updateTotal();
+    } else {
+        alert('At least one output item is required.');
+    }
+}
+
+function updateTotal() {
+    const weights = document.querySelectorAll('.child-weight');
+    let total = 0;
+    weights.forEach(w => total += parseFloat(w.value) || 0);
+    document.getElementById('totalWeight').textContent = total.toFixed(3);
+}
+
+function updateParentInfo(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    if (opt.value) {
+        document.getElementById('parentName').textContent = opt.dataset.name;
+        document.getElementById('parentWeight').textContent =
+            parseFloat(opt.dataset.weight).toFixed(3);
+        document.getElementById('parentInfo').classList.remove('d-none');
+    } else {
+        document.getElementById('parentInfo').classList.add('d-none');
+    }
+}
+</script>
+}

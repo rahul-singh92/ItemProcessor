@@ -1,0 +1,76 @@
+@model List<ItemProcessor.Models.Item>
+@{ ViewData["Title"] = "Items"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Items</h2>
+    <a asp-action="Create" class="btn btn-primary">+ Add Item</a>
+</div>
+
+<!-- Search bar -->
+<form method="get" class="mb-3">
+    <div class="input-group">
+        <input name="search" value="@ViewBag.Search"
+               class="form-control" placeholder="Search by name or description..."/>
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+        @if (!string.IsNullOrEmpty(ViewBag.Search))
+        {
+            <a asp-action="Index" class="btn btn-outline-danger">Clear</a>
+        }
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No items found.
+        <a asp-action="Create">Add your first item</a>
+    </div>
+}
+else
+{
+    <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Weight (kg)</th>
+            <th>Description</th>
+            <th>Created By</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ItemId</td>
+                <td>@item.ItemName</td>
+                <td>@item.Weight.ToString("F3")</td>
+                <td>@(item.Description ?? "—")</td>
+                <td>@(item.Creator?.Username ?? "—")</td>
+                <td>@item.CreatedAt.ToString("dd MMM yyyy")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ItemId"
+                       class="btn btn-sm btn-warning">Edit</a>
+
+                    <a asp-controller="Process" asp-action="Create"
+                       asp-route-id="@item.ItemId"
+                       class="btn btn-sm btn-success">Process</a>
+
+                    <a asp-controller="Process" asp-action="Tree"
+                       asp-route-id="@item.ItemId"
+                       class="btn btn-sm btn-info">Tree</a>
+
+                    <form asp-action="Delete" asp-route-id="@item.ItemId"
+                          method="post" style="display:inline"
+                          onsubmit="return confirm('Delete this item?')">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

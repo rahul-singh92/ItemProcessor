@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] — Item Processor</title>
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" asp-controller="Item"
+           asp-action="Index">Item Processor</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" asp-controller="Item"
+               asp-action="Index">Items</a>
+            <a class="nav-link" asp-controller="Process"
+               asp-action="Index">Processed</a>
+            <a class="nav-link" asp-controller="Process"
+               asp-action="AllTrees">Tree View</a>
+            <a class="nav-link text-danger"
+               asp-controller="Account"
+               asp-action="Logout">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible">
+            @TempData["Success"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @RenderBody()
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

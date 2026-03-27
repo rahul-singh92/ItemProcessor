@@ -1,0 +1,31 @@
+@model ItemProcessor.Models.ViewModels.ItemTreeViewModel
+
+<div style="margin-left: @(Model.Level * 30)px"
+     class="mb-2">
+    <div class="d-flex align-items-center gap-2">
+        @if (Model.Level > 0)
+        {
+            <span class="text-muted">└─</span>
+        }
+        <span class="badge @(Model.Level == 0 ? "bg-dark" :
+                              Model.IsProcessed ? "bg-success" : "bg-secondary")
+                     fs-6">
+            @Model.ItemName
+        </span>
+        <small class="text-muted">
+            Weight: @Model.Weight.ToString("F3") kg
+            @if (Model.OutputWeight.HasValue)
+            {
+                <span>| Output: @Model.OutputWeight.Value.ToString("F3") kg</span>
+            }
+        </small>
+        <a asp-action="Tree" asp-route-id="@Model.ItemId"
+           class="btn btn-outline-info btn-sm">Expand</a>
+    </div>
+
+    @* Recursively render children *@
+    @foreach (var child in Model.Children)
+    {
+        await Html.RenderPartialAsync("_TreeNode", child);
+    }
+</div>

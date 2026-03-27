@@ -1,0 +1,50 @@
+@model List<ItemProcessor.Models.ProcessedItem>
+@{ ViewData["Title"] = "Processed Items"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Processed Items</h2>
+    <a asp-action="Create" class="btn btn-success">+ Process Item</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No processed items yet.
+        <a asp-action="Create">Process your first item</a>
+    </div>
+}
+else
+{
+    <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>Parent Item</th>
+            <th>Parent Weight</th>
+            <th>Output Item</th>
+            <th>Output Weight</th>
+            <th>Processed By</th>
+            <th>Processed At</th>
+            <th>Notes</th>
+            <th>Tree</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>@p.ParentItem?.ItemName</td>
+                <td>@p.ParentItem?.Weight.ToString("F3")</td>
+                <td>@p.ChildItem?.ItemName</td>
+                <td>@p.OutputWeight.ToString("F3")</td>
+                <td>@p.Processor?.Username</td>
+                <td>@p.ProcessedAt.ToString("dd MMM yyyy HH:mm")</td>
+                <td>@(p.Notes ?? "—")</td>
+                <td>
+                    <a asp-action="Tree"
+                       asp-route-id="@p.ParentItemId"
+                       class="btn btn-sm btn-info">View Tree</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
