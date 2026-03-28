@@ -212,4 +212,3 @@ Password: Admin@123
 - Output weight of child items cannot exceed the parent item weight
 - The tree view supports unlimited depth of parent-child hierarchy
 - All passwords are hashed using SHA256 before storing
-```
